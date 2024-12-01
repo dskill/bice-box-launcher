@@ -76,6 +76,30 @@ if [ -f "$INSTALL_DIR/$APP_NAME" ]; then
     echo ">> Current version: ${CURRENT_VERSION:-unknown}"
 fi
 
+# Function to check internet connectivity
+check_internet() {
+    # Try to ping GitHub (or any reliable host)
+    if ping -c 1 github.com >/dev/null 2>&1; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Wait for internet connectivity (max 60 seconds)
+echo ">> Checking internet connectivity..."
+RETRY_COUNT=0
+MAX_RETRIES=12  # 12 retries * 5 seconds = 60 seconds total
+while ! check_internet; do
+    if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+        echo "!! Error: No internet connection after 60 seconds"
+        exit 1
+    fi
+    echo ">> Waiting for internet connection... ($(( MAX_RETRIES - RETRY_COUNT )) attempts remaining)"
+    sleep 5
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+done
+
 # Get the latest release version
 echo ">> Checking for latest version..."
 if command -v jq >/dev/null 2>&1; then
