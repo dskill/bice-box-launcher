@@ -104,7 +104,6 @@ done
 echo ">> Checking for latest version..."
 if command -v jq >/dev/null 2>&1; then
     RESPONSE=$(curl -sL https://api.github.com/repos/$GITHUB_REPO/releases/latest)
-    echo "$RESPONSE"
     if [[ $RESPONSE == *"API rate limit exceeded"* ]]; then
         echo "!! GitHub API rate limit exceeded. Using alternative method..."
         LATEST_VERSION=$(curl -sL -o /dev/null -w '%{url_effective}' "https://github.com/$GITHUB_REPO/releases/latest" | grep -o '[^/]*$')
