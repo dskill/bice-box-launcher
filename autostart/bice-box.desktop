@@ -1,0 +1,4 @@
+[Desktop Entry]
+Type=Application
+Name=Bice Box Start
+Exec=lxterminal -e "bash -c '/home/patch/bice-box-launcher/launch.sh -r; read -p \"Press Enter to close...\"'"
