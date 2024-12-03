@@ -10,16 +10,29 @@ echo "
 ╚═════╝ ╚═╝ ╚═════╝╚══════╝    ╚═════╝  ╚═════╝ ╚═╝  ╚═╝
 "
 
+# Add after the ASCII banner
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    echo "Usage: $0 [OPTIONS]"
+    echo "Options:"
+    echo "  -u, --update-only    Install/update without running the application"
+    echo "  -h, --help           Show this help message"
+    exit 0
+fi
+
 # Configuration
 APP_NAME="bice-box"
 GITHUB_REPO="dskill/bice-box"
 INSTALL_DIR="$HOME/$APP_NAME"
 
 # Add command line argument parsing
-RUN_AFTER_INSTALL=false
-while getopts "r" flag; do
+RUN_AFTER_INSTALL=true
+while getopts "u-:" flag; do
     case "${flag}" in
-        r) RUN_AFTER_INSTALL=true ;;
+        u) RUN_AFTER_INSTALL=false ;;
+        -) case "${OPTARG}" in
+               update-only) RUN_AFTER_INSTALL=false ;;
+               *) echo "Invalid option: --${OPTARG}" >&2; exit 1 ;;
+           esac ;;
     esac
 done
 
@@ -160,7 +173,7 @@ if [ ! -z "$CURRENT_VERSION" ]; then
             echo "[INFO] Starting $APP_NAME..."
             "$INSTALL_DIR/$APP_NAME"
         else
-            echo "[INFO] To run the application, use: $INSTALL_DIR/$APP_NAME"
+            echo "[INFO] Installation complete. Use '$INSTALL_DIR/$APP_NAME' to run the application."
         fi
         exit 0
     elif [ "$COMPARE_RESULT" = "greater" ]; then
@@ -169,7 +182,7 @@ if [ ! -z "$CURRENT_VERSION" ]; then
             echo "[INFO] Starting $APP_NAME..."
             "$INSTALL_DIR/$APP_NAME"
         else
-            echo "[INFO] To run the application, use: $INSTALL_DIR/$APP_NAME"
+            echo "[INFO] Installation complete. Use '$INSTALL_DIR/$APP_NAME' to run the application."
         fi
         exit 0
     fi
@@ -209,5 +222,5 @@ if [ "$RUN_AFTER_INSTALL" = true ]; then
     echo "[INFO] Starting $APP_NAME..."
     "$INSTALL_DIR/$APP_NAME"
 else
-    echo "[INFO] To run the application, use: $INSTALL_DIR/$APP_NAME"
+    echo "[INFO] Installation complete. Use '$INSTALL_DIR/$APP_NAME' to run the application."
 fi 
