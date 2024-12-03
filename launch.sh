@@ -25,6 +25,34 @@ done
 
 echo ">> Installing $APP_NAME..."
 
+# Add git update check at the beginning
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+if [ -d "$SCRIPT_DIR/.git" ]; then
+    echo ">> Checking for script updates..."
+    cd "$SCRIPT_DIR"
+    
+    # Fetch latest changes
+    git fetch origin main
+    
+    # Compare local and remote versions
+    LOCAL=$(git rev-parse HEAD)
+    REMOTE=$(git rev-parse origin/main)
+
+    if [ "$LOCAL" != "$REMOTE" ]; then
+        echo ">> Update available, pulling changes..."
+        git pull origin main
+        
+        # Make launcher executable
+        chmod +x "$0"
+        
+        echo ">> Relaunching updated script..."
+        exec "$0" "$@"
+        exit 0
+    else
+        echo ">> Script is up to date"
+    fi
+fi
+
 # Detect OS and Architecture
 OS=$(uname -s)
 ARCH=$(uname -m)
