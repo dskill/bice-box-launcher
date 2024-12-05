@@ -48,10 +48,10 @@ check_internet() {
     fi
 }
 
-# Wait for internet connectivity (max 60 seconds)
+# Wait for internet connectivity (max 10 seconds)
 echo ">> Checking internet connectivity..."
 RETRY_COUNT=0
-MAX_RETRIES=12  # 12 retries * 5 seconds = 60 seconds total
+MAX_RETRIES=2  # 2 retries * 5 seconds = 10 seconds total
 while ! check_internet; do
     if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
         echo "!! Error: No internet connection after 60 seconds"
