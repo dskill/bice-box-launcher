@@ -90,6 +90,27 @@ if [ -d "$SCRIPT_DIR/.git" ]; then
     fi
 fi
 
+# Add effects repo sync
+EFFECTS_DIR="$HOME/bice-box-effects"
+if [ -d "$EFFECTS_DIR/.git" ]; then
+    echo ">> Checking for effects updates..."
+    cd "$EFFECTS_DIR"
+    git fetch origin main
+    
+    LOCAL=$(git rev-parse HEAD)
+    REMOTE=$(git rev-parse origin/main)
+
+    if [ "$LOCAL" != "$REMOTE" ]; then
+        echo ">> Effects updates available, pulling changes..."
+        git pull origin main
+    else
+        echo ">> Effects are up to date"
+    fi
+else
+    echo ">> Cloning effects repository..."
+    git clone https://github.com/dskill/bice-box-effects.git "$EFFECTS_DIR"
+fi
+
 # Detect OS and Architecture
 OS=$(uname -s)
 ARCH=$(uname -m)
