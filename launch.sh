@@ -44,7 +44,7 @@ check_internet() {
 # Wait for internet connectivity (max 10 seconds)
 echo ">> Checking internet connectivity..."
 RETRY_COUNT=0
-MAX_RETRIES=2  # 2 retries * 5 seconds = 10 seconds total
+MAX_RETRIES=4  # 2 retries * 5 seconds = 10 seconds total
 while ! check_internet; do
     if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
         echo "!! Error: No internet connection after 60 seconds"
@@ -61,6 +61,27 @@ if [ -d "$SCRIPT_DIR/.git" ]; then
     echo ">> Checking for script updates..."
     cd "$SCRIPT_DIR"
     
+    # Check for repository corruption
+    if ! git status &>/dev/null; then
+        echo "!! Corrupted script repository detected, attempting repair..."
+        git fsck --full
+        git gc --prune=now
+        
+        # If repair failed, force resync
+        if ! git status &>/dev/null; then
+            echo "!! Repair failed, resyncing script repository..."
+            rm -rf .git
+            git init
+            git remote add origin https://github.com/$GITHUB_REPO.git
+            git fetch origin main
+            git reset --hard origin/main
+            chmod +x "$0"
+            echo ">> Relaunching updated script..."
+            exec "$0" "$@"
+            exit 0
+        fi
+    fi
+    
     # Fetch latest changes
     git fetch origin main
     
@@ -71,10 +92,7 @@ if [ -d "$SCRIPT_DIR/.git" ]; then
     if [ "$LOCAL" != "$REMOTE" ]; then
         echo ">> Update available, pulling changes..."
         git pull origin main
-        
-        # Make launcher executable
         chmod +x "$0"
-        
         echo ">> Relaunching updated script..."
         exec "$0" "$@"
         exit 0
@@ -82,22 +100,36 @@ if [ -d "$SCRIPT_DIR/.git" ]; then
         echo ">> Script is up to date"
     fi
 fi
-
 # Add effects repo sync
 EFFECTS_DIR="$HOME/bice-box-effects"
 if [ -d "$EFFECTS_DIR/.git" ]; then
     echo ">> Checking for effects updates..."
     cd "$EFFECTS_DIR"
-    git fetch origin main
     
-    LOCAL=$(git rev-parse HEAD)
-    REMOTE=$(git rev-parse origin/main)
-
-    if [ "$LOCAL" != "$REMOTE" ]; then
-        echo ">> Effects updates available, pulling changes..."
-        git pull origin main
+    # Try to repair if corrupted
+    if ! git status &>/dev/null; then
+        echo "!! Corrupted effects repository detected, attempting repair..."
+        git fsck --full
+        git gc --prune=now
+        
+        # If repair failed, do full resync
+        if ! git status &>/dev/null; then
+            echo "!! Repair failed, resyncing repository..."
+            cd ..
+            rm -rf "$EFFECTS_DIR"
+            git clone https://github.com/dskill/bice-box-effects.git "$EFFECTS_DIR"
+        fi
     else
-        echo ">> Effects are up to date"
+        git fetch origin main
+        LOCAL=$(git rev-parse HEAD)
+        REMOTE=$(git rev-parse origin/main)
+
+        if [ "$LOCAL" != "$REMOTE" ]; then
+            echo ">> Effects updates available, pulling changes..."
+            git pull origin main
+        else
+            echo ">> Effects are up to date"
+        fi
     fi
 else
     echo ">> Cloning effects repository..."
