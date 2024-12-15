@@ -54,7 +54,6 @@ while ! check_internet; do
     sleep 5
     RETRY_COUNT=$((RETRY_COUNT + 1))
 done
-
 # Add git update check after internet check
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 if [ -d "$SCRIPT_DIR/.git" ]; then
@@ -63,23 +62,16 @@ if [ -d "$SCRIPT_DIR/.git" ]; then
     
     # Check for repository corruption
     if ! git status &>/dev/null; then
-        echo "!! Corrupted script repository detected, attempting repair..."
-        git fsck --full
-        git gc --prune=now
-        
-        # If repair failed, force resync
-        if ! git status &>/dev/null; then
-            echo "!! Repair failed, resyncing script repository..."
-            rm -rf .git
-            git init
-            git remote add origin https://github.com/$GITHUB_REPO.git
-            git fetch origin main
-            git reset --hard origin/main
-            chmod +x "$0"
-            echo ">> Relaunching updated script..."
-            exec "$0" "$@"
-            exit 0
-        fi
+        echo "!! Corrupted script repository detected, resyncing..."
+        rm -rf .git
+        git init
+        git remote add origin https://github.com/$GITHUB_REPO.git
+        git fetch origin main
+        git reset --hard origin/main
+        chmod +x "$0"
+        echo ">> Relaunching updated script..."
+        exec "$0" "$@"
+        exit 0
     fi
     
     # Fetch latest changes
@@ -100,25 +92,20 @@ if [ -d "$SCRIPT_DIR/.git" ]; then
         echo ">> Script is up to date"
     fi
 fi
+
+
 # Add effects repo sync
 EFFECTS_DIR="$HOME/bice-box-effects"
 if [ -d "$EFFECTS_DIR/.git" ]; then
     echo ">> Checking for effects updates..."
     cd "$EFFECTS_DIR"
     
-    # Try to repair if corrupted
+    # Check for repository corruption
     if ! git status &>/dev/null; then
-        echo "!! Corrupted effects repository detected, attempting repair..."
-        git fsck --full
-        git gc --prune=now
-        
-        # If repair failed, do full resync
-        if ! git status &>/dev/null; then
-            echo "!! Repair failed, resyncing repository..."
-            cd ..
-            rm -rf "$EFFECTS_DIR"
-            git clone https://github.com/dskill/bice-box-effects.git "$EFFECTS_DIR"
-        fi
+        echo "!! Corrupted effects repository detected, resyncing..."
+        cd ..
+        rm -rf "$EFFECTS_DIR"
+        git clone https://github.com/dskill/bice-box-effects.git "$EFFECTS_DIR"
     else
         git fetch origin main
         LOCAL=$(git rev-parse HEAD)
