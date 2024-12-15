@@ -123,36 +123,8 @@ else
     git clone https://github.com/dskill/bice-box-effects.git "$EFFECTS_DIR"
 fi
 
-# Detect OS and Architecture
-OS=$(uname -s)
-ARCH=$(uname -m)
-
-# Determine which build to download
-case "$OS" in
-    "Darwin")
-        if [ "$ARCH" = "arm64" ]; then
-            echo ">> Detected Mac ARM64 (Apple Silicon)"
-            echo "!! Please download the DMG manually from: https://github.com/$GITHUB_REPO/releases"
-            exit 1
-        else
-            echo "!! This application only supports Apple Silicon Macs"
-            exit 1
-        fi
-        ;;
-    "Linux")
-        if [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
-            BUILD_SUFFIX="-arm64.zip"
-            echo ">> Detected Linux ARM64 (Raspberry Pi)"
-        else
-            echo "!! This application only supports Raspberry Pi (ARM64)"
-            exit 1
-        fi
-        ;;
-    *)
-        echo "!! Unsupported operating system: $OS"
-        exit 1
-        ;;
-esac
+# Only supports rasberry pi arm64
+BUILD_SUFFIX="-arm64.zip"
 
 # Function to compare version strings
 version_compare() {
