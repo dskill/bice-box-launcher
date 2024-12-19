@@ -47,8 +47,8 @@ RETRY_COUNT=0
 MAX_RETRIES=4  # 4 retries * 5 seconds = 20 seconds total
 while ! check_internet; do
     if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
-        echo "!! Error: No internet connection after 60 seconds"
-        exit 1
+        echo "!! Warning: No internet connection after 60 seconds. Continuing without updates..."
+        break
     fi
     echo ">> Waiting for internet connection... ($(( MAX_RETRIES - RETRY_COUNT )) attempts remaining)"
     sleep 5
