@@ -47,7 +47,13 @@ RETRY_COUNT=0
 MAX_RETRIES=4  # 4 retries * 5 seconds = 20 seconds total
 while ! check_internet; do
     if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
-        echo "!! Warning: No internet connection after 60 seconds. Continuing without updates..."
+        echo "!! Warning: No internet connection after 60 seconds."
+        if [ "$RUN_AFTER_INSTALL" = true ]; then
+            echo "Launching without updates..."
+            echo "[INFO] Starting $APP_NAME..."
+            "$INSTALL_DIR/$APP_NAME"
+            exit 0
+        fi
         break
     fi
     echo ">> Waiting for internet connection... ($(( MAX_RETRIES - RETRY_COUNT )) attempts remaining)"
