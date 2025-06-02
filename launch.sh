@@ -113,13 +113,15 @@ if [ -d "$EFFECTS_DIR/.git" ]; then
         rm -rf "$EFFECTS_DIR"
         git clone https://github.com/dskill/bice-box-effects.git "$EFFECTS_DIR"
     else
+        # Add this line to remove a potential lock file
+        rm -f .git/index.lock
         git fetch origin main
         LOCAL=$(git rev-parse HEAD)
         REMOTE=$(git rev-parse origin/main)
 
         if [ "$LOCAL" != "$REMOTE" ]; then
             echo ">> Effects updates available, pulling changes..."
-            git pull origin main
+            git reset --hard origin/main
         else
             echo ">> Effects are up to date"
         fi
