@@ -120,7 +120,7 @@ if [ -d "$EFFECTS_DIR/.git" ]; then
         REMOTE=$(git rev-parse origin/main)
 
         if [ "$LOCAL" != "$REMOTE" ]; then
-            echo ">> Effects updates available, pulling changes..."
+            echo ">> Effects updates available.  Running 'git reset --hard origin/main'"
             git reset --hard origin/main
         else
             echo ">> Effects are up to date"
