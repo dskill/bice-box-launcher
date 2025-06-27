@@ -230,6 +230,13 @@ unzip -o "$TMP_FILE" -d "$INSTALL_DIR"
 echo ">> Cleaning up..."
 rm "$TMP_FILE"
 
+# Source nvm if it exists to get node/npm packages in PATH
+export NVM_DIR="$HOME/.nvm"
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+    . "$NVM_DIR/nvm.sh"
+    echo ">> Sourced nvm.sh to set up PATH."
+fi
+
 echo "[INFO] Installation complete! You can find $APP_NAME in $INSTALL_DIR"
 if [ "$RUN_AFTER_INSTALL" = true ]; then
     echo "[INFO] Starting $APP_NAME..."
