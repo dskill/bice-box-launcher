@@ -230,19 +230,7 @@ unzip -o "$TMP_FILE" -d "$INSTALL_DIR"
 echo ">> Cleaning up..."
 rm "$TMP_FILE"
 
-# Source nvm if it exists to get node/npm packages in PATH
-export NVM_DIR="$HOME/.nvm"
-if [ -s "$NVM_DIR/nvm.sh" ]; then
-    . "$NVM_DIR/nvm.sh"
-    echo ">> Sourced nvm.sh to set up PATH."
-fi
 
-# Add Claude CLI to PATH if it exists
-CLAUDE_BIN_PATH="$HOME/.claude/local/node_modules/.bin"
-if [ -d "$CLAUDE_BIN_PATH" ]; then
-    export PATH="$CLAUDE_BIN_PATH:$PATH"
-    echo ">> Added Claude CLI to PATH."
-fi
 
 echo "[INFO] Installation complete! You can find $APP_NAME in $INSTALL_DIR"
 if [ "$RUN_AFTER_INSTALL" = true ]; then
