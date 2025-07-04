@@ -237,6 +237,13 @@ if [ -s "$NVM_DIR/nvm.sh" ]; then
     echo ">> Sourced nvm.sh to set up PATH."
 fi
 
+# Add Claude CLI to PATH if it exists
+CLAUDE_BIN_PATH="$HOME/.claude/local/node_modules/.bin"
+if [ -d "$CLAUDE_BIN_PATH" ]; then
+    export PATH="$CLAUDE_BIN_PATH:$PATH"
+    echo ">> Added Claude CLI to PATH."
+fi
+
 echo "[INFO] Installation complete! You can find $APP_NAME in $INSTALL_DIR"
 if [ "$RUN_AFTER_INSTALL" = true ]; then
     echo "[INFO] Starting $APP_NAME..."
