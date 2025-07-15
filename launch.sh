@@ -235,6 +235,21 @@ export NVM_DIR="$HOME/.nvm"
 if [ -s "$NVM_DIR/nvm.sh" ]; then
     . "$NVM_DIR/nvm.sh"
     echo ">> Sourced nvm.sh to set up PATH."
+    
+    # Explicitly export NVM variables for the Electron app
+    export NVM_BIN
+    export NVM_PATH
+    export NODE_PATH
+    echo ">> Exported NVM environment variables: NVM_BIN=$NVM_BIN"
+    
+    # Debug: Check if node is accessible
+    if command -v node >/dev/null 2>&1; then
+        echo ">> Node found at: $(which node)"
+        echo ">> Node version: $(node --version)"
+    else
+        echo "!! Warning: Node not found in PATH"
+        echo "!! Current PATH: $PATH"
+    fi
 fi
 
 
